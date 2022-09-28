@@ -36,19 +36,34 @@
                                             <th class="sorting_disabled" rowspan="1" colspan="1" style="width: 100px;">Created Date</th>
                                         </tr>
                                     </thead> -->
+                                    <tfoot>
+                                    <tr>
+                                        <th colspan="7" class="text-sm-right text-primary" >
+                                            <!-- value -->
+                                        </th>
+
+
+                                        <th><span class="btn btn-success btn-round btn-mini waves-effect waves-light mr-1"><a href="{{route('order.approved')}}/{{$order_details->bill_id}}" class="btn-label hidden-sm">Confirm</a> </span>
+                                            
+                                        <span class="btn btn-danger btn-round btn-mini waves-effect waves-light mr-1"><a href="{{route('order.cancelled')}}/{{$order_details->bill_id}}" class="btn-label hidden-sm">Cancel</a> </span> </th>
+                                        <th></th>
+
+                                    </tr>
+                                </tfoot>
                                 </table>
+                                                    
                               </div>
-                            </fieldset>
+                              
+                          </fieldset>
                             <h3> Delivery Details </h3>
 
-                            @foreach($shipping as $ship)
                             <fieldset class="bank-detail p-t-5">
                                 <div class="row justify-content-center">
                                     <div class="col-md-6">
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="form-group">
-                                                    <label for="card-number" class="form-label">Customer's Name : <u class="text-success"><span class="text-danger">{{$ship->name}}</span></u></label>
+                                                    <label for="card-number" class="form-label">Customer's Name : <u class="text-success"><span class="text-danger">{{$order_details['getUser']->name}}</span></u></label>
                                                 </div>
                                                 
                                             </div>
@@ -56,7 +71,7 @@
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="form-group">
-                                                    <label for="address" class="form-label">Address : <span class="text-danger text-uppercase">{{$ship->address}}</span> </label>
+                                                    <label for="address" class="form-label">Address : <span class="text-danger text-uppercase">{{$order_details->delivery_location}}</span> </label>
                                                 </div>
                                             </div>
                                         </div>
@@ -64,55 +79,49 @@
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="form-group">
-                                                    <label for="email" class="form-label">City : <span class="text-danger">{{$ship->city}}</span> </label>
+                                                    <label for="email" class="form-label">E-mail : <span class="text-danger">{{$order_details['getUser']->email}}</span> </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="form-group">
+                                                    <label for="phone" class="form-label">Phone : <span class="text-danger">{{$order_details->mobile}} </span></label>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="form-group">
-                                                    <label for="location" class="form-label">Delivery Location : <span class="text-danger">{{$ship->map_address}}</span></label>
+                                                    <label for="total" class="form-label">Total_Amount :Rs <span class="text-danger">{{$order_details->grand_total}} </span></label>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <div class="form-group">
-                                                    <label for="phone-2" class="form-label">Phone : <span class="text-danger">{{$ship->phone_no}}</span></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <div class="form-group">
-                                                    <label for="location" class="form-label">Status : <span class="text-danger">{{$ship->status}}</span></label>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                 </div>
 
                             </fieldset>
-                            @endforeach
                             
                             <!-- Delivery Details fieldset end -->
                             <!-- Payment Details fieldset start -->
 
-                            <!-- <h3> Payment Details </h3>
+                            <h3> Payment Details </h3>
                             <fieldset class="bank-detail">
                                 <div class="row justify-content-center">
                                     <div class="col-md-6">
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="input-group">
-                                                    Payment Method: Esewa
+                                                    Payment Method: 
                                                     
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </fieldset> -->
+                            </fieldset>
 
                             <!-- Payment Details fieldset end -->
 
@@ -132,6 +141,26 @@
     <script>
         $(document).ready(function() {
             var dataTable = $('#show-order-table').DataTable({
+                "footerCallback": function ( row, data, start, end, display ) {
+                    var api = this.api(), data;
+
+                    var intVal = function ( i ) {
+                        return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '')*1 :
+                        typeof i === 'number' ?
+                        i : 0;
+                    };
+
+                    var Total = api
+                    .column(6)
+                    .data()
+                    .reduce( function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0 );
+
+
+                    $(api.column(6).footer()).html('Total : '+ Total);
+                },
                 "searching" : true,
                 "processing": true,
                 dom: 'Bfrtip',
@@ -159,10 +188,9 @@
                     { data: 'bill_id', title: 'Bill Id', orderable: true,searchable: true },
                     { data: 'product_id', title: 'Product', orderable: true,searchable: true },
                     { data: 'quantity', title: 'Qty', orderable: true,searchable: true },
-                    { data: 'rate', title: 'Rate', orderable: true,searchable: true },
-                    { data: 'discount', title: 'Dis.', orderable: true,searchable: true },
-                    { data: 'total', title: 'Total', orderable: true,searchable: true },
-                    { data: 'date', title: 'Ordered Date' , orderable: true,searchable: true},
+                    { data: 'rate', title: 'Rate(Rs)', orderable: true,searchable: true },
+                    { data: 'discount', title: 'Dis.(Rs)', orderable: true,searchable: true },
+                    { data: 'total', title: 'Total(Rs)', orderable: true,searchable: true },
                     { data: 'is_confirmed', title: 'Confirmation', orderable: true,searchable: true ,
                     render: function ( data, type, row ) {
                         if (data == "0") {
@@ -181,9 +209,10 @@
                         }
 
                     },
+                    { data: 'date', title: 'Ordered Date' , orderable: true,searchable: true},
                     // { data: 'confirmed_date', title: 'Confirmed Date', orderable: true,searchable: true },
                     { data: 'deliver_date', title: 'Deliver Date', orderable: true,searchable: true },
-                    { data: 'confirmed_by', title: 'Confirmed By', orderable: true,searchable: true },
+                    // { data: 'confirmed_by', title: 'Confirmed By', orderable: true,searchable: true },
                     // { data: 'created_at', title: 'Created Date',orderable: true,searchable: true  }
                     
                 ],
@@ -210,4 +239,3 @@
         </script>
     @endif
 @endsection
-

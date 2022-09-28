@@ -39,6 +39,15 @@
             </li>
 
 
+
+            <li>
+                <a href="{{route('product.Index')}}">
+                    <span class="pcoded-micon"><i class="feather icon-shield"></i></span>
+                    <span class="pcoded-mtext">Products</span>
+                </a>
+            </li>
+
+
         </ul>
     </div>
 </nav>

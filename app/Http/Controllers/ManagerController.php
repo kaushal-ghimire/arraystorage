@@ -8,6 +8,8 @@ use App\Models\Order;
 use App\Models\User;
 use App\Models\ShippingAddress;
 use App\Models\OrderDetails;
+use Auth;
+
 
 use Illuminate\Support\Facades\Session;
 
@@ -28,6 +30,36 @@ class ManagerController extends BaseController
       return view('manager.order.index');
    }
 
+   public function productIndex(){
+    return view('manager.productIndex');
+    }
+
+    
+
+    public function Products(){
+        $id= Auth::id();
+        $product = Product::select('products.id','products.Product_Id','products.name','products.size','products.color','products.image','products.purchased_quantity','products.purchase_price','products.unit','products.vat','products.purchased_price','products.sell_quantity','products.margin','products.delivery_charge','products.discount','products.selling_price','products.description','products.created_at','users.name as username')
+        ->join('users','products.user_id','=','users.id')
+        ->where('users.id',$id)
+        // ->groupBy('product_id')
+        ->get();
+
+        return Datatables::of($product)
+            ->rawColumns(['created_at'])
+            ->editColumn('created_at', function($product) {
+        return $this->getParsedDatetime($product->created_at);  
+            })
+            ->addColumn('image', function ($row) {             
+                $url= asset('img/'.$row->image);            
+                return '<img src="'.$url.'" border="0" width="50" class="img-rounded" align="center" />';       
+            })
+            
+            
+            ->rawColumns(['created_at','image'])
+
+            ->make(true);
+    }
+
 /* -------------------------- Order Details -------------------------- */
 
    public function getAllOrder(Request $request)
@@ -41,12 +73,13 @@ class ManagerController extends BaseController
                         4 => 'grand_total', 
                         5 => 'date', 
                         6 => 'received',
-                        7 => 'delivery_location', 
-                        7 => 'is_active', 
-                        8 => 'is_confirmed', 
-                        9 => 'created_by', 
-                        10 => 'created_at', 
-                        11 => 'action', 
+                        7 => 'delivery_location',
+                        8 => 'mobile', 
+                        9 => 'is_active', 
+                        10 => 'is_confirmed', 
+                        11 => 'created_by', 
+                        12 => 'created_at', 
+                        13 => 'action', 
                         
                     );
 
@@ -98,17 +131,18 @@ class ManagerController extends BaseController
                 $nestedData['date'] = $this->getParsedDateTime($post->date);
                 $nestedData['received'] = $post->received;
                 $nestedData['delivery_location'] = $post->delivery_location;
+                $nestedData['mobile'] = $post->mobile;
                 $nestedData['is_active'] = $post->is_active;
                 $nestedData['is_confirmed'] = $post->is_confirmed;
                 $nestedData['created_by'] = $post['getUser']->name;
                 $nestedData['created_at'] = $this->getParsedDateTime($post->created_at);
                 $nestedData['action'] =
                 $action = '<div class="btn-group " role="group">
-                            <a href='.route('manager.order.show',$post->bill_id).' class="btn btn-primary btn-round btn-mini waves-effect waves-light mr-1"><span class="btn-label hidden-sm">View</span> </a>
+                            <a href='.route('manager.order.show',$post->bill_id).' class="btn btn-primary btn-round btn-mini waves-effect waves-light mr-1"><span class="btn-label hidden-sm">View</span> </a>';
                  
-                 <a href='.route('order.confirm',$post->bill_id).'  class="btn btn-success btn-round btn-mini waves-effect waves-light mr-1"><span class="btn-label hidden-sm" >Confirm</span> </a>
+                //  <a href='.route('order.confirm',$post->bill_id).'  class="btn btn-success btn-round btn-mini waves-effect waves-light mr-1"><span class="btn-label hidden-sm" >Confirm</span> </a>
                  
-                <a href='.route('order.cancel',$post->bill_id).' class="btn btn-danger btn-round btn-mini waves-effect waves-light mr-1"><span class="btn-label hidden-sm">Cancel</span> </a>'; 
+                // <a href='.route('order.cancel',$post->bill_id).' class="btn btn-danger btn-round btn-mini waves-effect waves-light mr-1"><span class="btn-label hidden-sm">Cancel</span> </a>'; 
                     '</div>';              
                 $data[] = $nestedData;
             }
@@ -129,9 +163,9 @@ class ManagerController extends BaseController
 
    public function show($id)
    { 
-     $shipping = ShippingAddress::get();
-      $orderid = $id;
-      return view('manager.order.show',compact('shipping','orderid') );
+    $order_details = OrderDetails::where('bill_id',$id)->first();
+          $orderid = $id;
+      return view('manager.order.show',compact('order_details','orderid') );
    }
 
    public function showAllOrder(Request $request)
@@ -333,6 +367,7 @@ class ManagerController extends BaseController
    
    public function orderCancelled()
    {
+
     return view ('manager.order.cancelled');
    }
 

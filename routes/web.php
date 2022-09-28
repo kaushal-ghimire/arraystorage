@@ -101,11 +101,14 @@ Route::group(['prefix' => 'manager', 'middleware' => [ 'isManager']], function (
     Route::get('/order/pending', [ManagerController::class, 'orderPending'])->name('order.pending');
     Route::post('/order/pending-data', [App\Http\Controllers\ManagerController::class, 'getPending'])->name('pending.data');
 
-    Route::get('/order/approved', [ManagerController::class, 'orderApproved'])->name('order.approved');
+    Route::get('/order/confirmed', [ManagerController::class, 'orderApproved'])->name('order.approved');
     Route::post('/order/approved-data', [App\Http\Controllers\ManagerController::class, 'getApproved'])->name('approved.data');
 
     Route::get('/order/cancelled', [ManagerController::class, 'orderCancelled'])->name('order.cancelled');
     Route::post('/order/cancelled-data', [App\Http\Controllers\ManagerController::class, 'getCancelled'])->name('cancelled.data');
+
+    Route::get('/productIndex', [ManagerController::class, 'productIndex'])->name('product.Index');
+    Route::post('/manager/products', [ManagerController::class, 'Products'])->name('manager.products.data');
 
 });
 
