@@ -37,6 +37,7 @@
     
    
     @yield('styles')
+    @stack('css')
 </head>
 
 <body>
@@ -138,6 +139,7 @@
      }
 </script>
 @yield('scripts')
+@stack('js')
 </body>
 
 </html>

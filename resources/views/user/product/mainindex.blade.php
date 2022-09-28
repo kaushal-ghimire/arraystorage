@@ -55,7 +55,7 @@
                             </div>
                         </div>
                         <div class="dt-responsive table-responsive">
-                            <table id="list-product-table" class="table table-hover table-bordered table-responsive-sm" style="width: 100%"> 
+                            <table id="list-product-table1" class="table table-hover table-bordered table-responsive-sm" style="width: 100%"> 
                          
                             </table>
 
@@ -88,7 +88,7 @@
 
 <script>
         $(document).ready(function() {
-            var dataTable = $('#list-product-table').DataTable({
+            var dataTable = $('#list-product-table1').DataTable({
                 "searching":true,
                 "ordering":true,
                 "processing": true,

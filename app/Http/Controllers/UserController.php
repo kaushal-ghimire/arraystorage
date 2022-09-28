@@ -274,7 +274,7 @@ class UserController extends BaseController
             ->get();
 
         return Datatables::of($product)
-            ->rawColumns(['created_at'])
+            ->rawColumns(['created_at', 'image','action'])
             ->editColumn('created_at', function ($product) {
                 return $this->getParsedDatetime($product->created_at);
             })
@@ -283,17 +283,17 @@ class UserController extends BaseController
                 return '<img src="' . $url . '" border="0" width="50" class="img-rounded" align="center" />';
             })
             ->addColumn('action', function ($product) {
-                $action = '<div class="btn-group " role="group" >
-                    <a href=" '  . route('product.print', $product->id) .' " title="Print Details" class="btn btn-success btn-round btn-mini waves-effect waves-light mr-1" ><i class="fa fa-print" aria-hidden="true"></i> <span class="btn-label hidden-sm"></span></a>';
-                '</div>';
-                return ($action);
+                $urlPath = route('product.print', $product->id);
+
+                return '
+                    <div class="btn-group c" role="group" >
+                        <a href='. $urlPath .' target="_blank" title="Print Details" class="btn btn-success btn-round btn-mini waves-effect waves-light mr-1" >
+                            <i class="fa fa-print" aria-hidden="true"></i> 
+                            <span class="btn-label hidden-sm"></span>
+                        </a>
+                    </div>
+                ';
             })
-
-
-
-
-            ->rawColumns(['created_at', 'image'])
-
             ->make(true);
     }
 

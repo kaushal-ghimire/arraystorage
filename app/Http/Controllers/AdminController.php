@@ -96,20 +96,20 @@ class AdminController extends BaseController
     }
     public function editUser($id){
         
-        $users = User::where('id',$id)->first();
-        return view('admin.user.edit',compact('users'));
+        $manager = User::where('id',$id)->first();
+        return view('admin.user.edit',compact('manager'));
       
     }
     public function userUpdate(Request $request, $id)
     {
         $this->validate($request,[
             'name'=>'required|string']);
-
+        $check_data = User::find($id);
         User::whereId($id)->update([
             'name'=>$request['name'],
             'address'=>$request['address'],
             'email'=>$request['email'],
-            'password'=>$request['password'],
+            'password'=>$request['password'] != '' ? Hash::make($request['password']) : $check_data->password,
             'avatar'=>$request['avatar'],
             
         ]);
